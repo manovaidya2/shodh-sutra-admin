@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 const users = [
   { email: "Shodhsutra@123", password: "123" },
-  { email: "teacher@example.com", password: "123456" },
+  { email: "abhi@123", password: "123" },
   { email: "admin@example.com", password: "123456" },
 ];
 
