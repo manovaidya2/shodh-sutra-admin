@@ -6,3 +6,4 @@ const axiosInstance = axios.create({
   // remove withCredentials if you don't need cookies/auth
 });
 
+export default axiosInstance;
