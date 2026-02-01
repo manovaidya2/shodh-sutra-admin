@@ -8,6 +8,7 @@ import AdminConsultations from "./pages/AdminConsultations";
 import AdminGallery from "./pages/AdminGallery";
 import ShodhSutraAdmin from "./components/ShodhSutraAdmin";
 import AdminAdmissionPartners from "./pages/AdminAdmissionPartners";
+import AdminMentors from "./pages/AdminMentors";
 
 
 
@@ -25,6 +26,7 @@ function App() {
           <Route path="/gallery" element={<Layout><AdminGallery /></Layout>} /> 
           <Route path="/shodh-student-data" element={<Layout><ShodhSutraAdmin/></Layout>} />
           <Route path="/shodh-admission-partners" element={<Layout><AdminAdmissionPartners/></Layout>} />
+           <Route path="/admin-mentors" element={<Layout><AdminMentors /></Layout>} />
 
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>

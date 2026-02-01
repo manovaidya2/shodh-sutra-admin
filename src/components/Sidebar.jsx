@@ -65,6 +65,14 @@ const Sidebar = () => {
             </li>
              <li className="mb-2">
               <Link
+                to="/admin-mentors"
+                className="flex items-center gap-2 px-2 py-2 rounded hover:bg-blue-900 hover:text-white transition-colors duration-200"
+              >
+                <FaBook /> Admin Mentors
+              </Link>
+            </li>
+             <li className="mb-2">
+              <Link
                 to="/shodh-admission-partners"
                 className="flex items-center gap-2 px-2 py-2 rounded hover:bg-blue-900 hover:text-white transition-colors duration-200"
               >
