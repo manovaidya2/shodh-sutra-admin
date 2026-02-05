@@ -79,6 +79,14 @@ const Sidebar = () => {
                 <FaBook /> Shodh Admission Partners
               </Link>
             </li>
+            <li className="mb-2">
+              <Link
+                to="/admin-university"
+                className="flex items-center gap-2 px-2 py-2 rounded hover:bg-blue-900 hover:text-white transition-colors duration-200"
+              >
+                <FaBook /> Shodh Admission Partners
+              </Link>
+            </li>
           </ul>
         </div>
 
