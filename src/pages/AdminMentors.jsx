@@ -1,28 +1,15 @@
 import React, { useEffect, useState } from "react";
 import axiosInstance from "../api/axiosInstance";
 import {
-  Search,
-  Eye,
-  Trash2,
-  X,
-  User,
-  Mail,
-  Phone,
-  FileText,
-  CheckCircle,
-  ChevronDown,
-  ChevronUp,
-  Building,
-  GraduationCap,
-  Briefcase,
-  MapPin,
-  Calendar,
-  BookOpen
+  Search, Eye, Trash2, X, User, Mail, Phone, FileText, CheckCircle,
+  ChevronDown, ChevronUp, Building, GraduationCap, Briefcase,
+  Calendar, BookOpen, Download, Image as ImageIcon, File, Award
 } from "lucide-react";
 
 export default function AdminMentorsDashboard() {
   const [mentors, setMentors] = useState([]);
-  const [selected, setSelected] = useState(null);
+  const [selected, setSelected] = useState(null); // Sidebar data
+  const [showModal, setShowModal] = useState(false); // Modal visibility
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [expanded, setExpanded] = useState({});
@@ -40,23 +27,21 @@ export default function AdminMentorsDashboard() {
     }
   };
 
-  useEffect(() => {
-    fetchMentors();
-  }, []);
+  useEffect(() => { fetchMentors(); }, []);
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this mentor?")) return;
+    if (!window.confirm("Delete this mentor?")) return;
     try {
       await axiosInstance.delete(`/mentor/${id}`);
-      alert("Deleted Successfully");
       fetchMentors();
-      if (selected?._id === id) setSelected(null);
-    } catch (err) {
-      alert("Delete Failed");
-    }
+      if (selected?._id === id) {
+        setSelected(null);
+        setShowModal(false);
+      }
+    } catch (err) { alert("Delete Failed"); }
   };
 
-  const toggle = (id) => {
+  const toggleAccordion = (id) => {
     setExpanded(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
@@ -67,97 +52,97 @@ export default function AdminMentorsDashboard() {
     });
   };
 
+  const getFileUrl = (path) => {
+    if (!path) return "";
+    const baseUrl = "https://api.shodhsutra.com/"; // Apne backend ka URL yahan check karein
+    return `${baseUrl}${path.replace(/\\/g, "/")}`;
+  };
+
+  const openFullProfile = (mentor) => {
+    setSelected(mentor);
+    setShowModal(true);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-6 font-sans">
-      {/* HEADER SECTION */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Mentor Applications Dashboard</h1>
-        <p className="text-gray-600">Complete management of research mentor profiles</p>
+        <p className="text-gray-600">Review all details, educational records, and documents</p>
       </div>
 
-      {/* SEARCH BAR */}
+      {/* SEARCH SECTION */}
       <div className="bg-white rounded-xl shadow-sm border p-6 mb-6">
         <div className="flex gap-4">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
-              placeholder="Search by mentor name, email, or research field..."
+              placeholder="Search mentors..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+              className="w-full pl-10 pr-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
             />
           </div>
-          <button onClick={fetchMentors} className="px-8 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold shadow-md">
+          <button onClick={fetchMentors} className="px-8 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-bold">
             Search
           </button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* LEFT SIDE: MENTOR LIST */}
+        {/* LIST SECTION */}
         <div className="lg:col-span-2">
           <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
-            <div className="p-6 border-b flex justify-between items-center bg-gray-50/30">
-              <h2 className="text-xl font-bold text-gray-800">Applications ({mentors.length})</h2>
-              <button onClick={fetchMentors} className="text-sm font-medium text-blue-600 hover:text-blue-800">Refresh</button>
+            <div className="p-6 border-b flex justify-between items-center bg-gray-50/50">
+              <h2 className="text-xl font-bold text-gray-800">Mentors List</h2>
+              <button onClick={fetchMentors} className="text-sm font-medium text-blue-600">Refresh</button>
             </div>
-
             <div className="overflow-x-auto">
-              {loading ? (
-                <div className="p-16 text-center">
-                  <div className="animate-spin h-12 w-12 border-4 border-blue-600 border-t-transparent mx-auto rounded-full"></div>
-                  <p className="mt-4 text-gray-500 font-medium">Fetching mentors...</p>
-                </div>
-              ) : mentors.length === 0 ? (
-                <div className="p-16 text-center text-gray-400 font-medium">No applications found.</div>
-              ) : (
-                <table className="w-full">
-                  <thead className="bg-gray-50 border-b">
-                    <tr className="text-gray-500 text-xs uppercase font-bold tracking-wider">
-                      <th className="px-6 py-4 text-left">Mentor Details</th>
-                      <th className="px-6 py-4 text-left">Contact</th>
-                      <th className="px-6 py-4 text-left">Actions</th>
+              <table className="w-full text-left">
+                <thead className="bg-gray-50 border-b text-xs uppercase font-bold text-gray-500">
+                  <tr>
+                    <th className="px-6 py-4">Mentor</th>
+                    <th className="px-6 py-4">Contact</th>
+                    <th className="px-6 py-4 text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {mentors.map((m) => (
+                    <tr key={m._id} className={`hover:bg-blue-50/30 transition-colors ${selected?._id === m._id ? 'bg-blue-50' : ''}`}>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-4">
+                          <div className="h-10 w-10 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold uppercase">
+                            {m?.personalInfo?.name?.charAt(0)}
+                          </div>
+                          <div>
+                            <p className="font-bold text-gray-900">{m?.personalInfo?.name}</p>
+                            <p className="text-xs text-blue-600 font-bold uppercase">{m?.basicInfo?.areaOfResearch}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-sm">
+                        <p className="font-medium text-gray-700">{m?.contactInfo?.email}</p>
+                        <p className="text-gray-400">{m?.contactInfo?.mobile}</p>
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        <div className="flex justify-center gap-2">
+                          <button onClick={() => setSelected(m)} className="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 border border-blue-200">
+                            <Eye size={18} />
+                          </button>
+                          <button onClick={() => handleDelete(m._id)} className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 border border-red-200">
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100">
-                    {mentors.map((m) => (
-                      <tr key={m._id} className="hover:bg-blue-50/30 transition-colors">
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-4">
-                            <div className="h-10 w-10 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold">
-                              {m?.personalInfo?.name?.charAt(0)}
-                            </div>
-                            <div>
-                              <p className="font-bold text-gray-900">{m?.personalInfo?.name}</p>
-                              <p className="text-xs text-blue-600 font-bold">{m?.basicInfo?.areaOfResearch}</p>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 text-sm">
-                          <p className="font-medium text-gray-700">{m?.contactInfo?.email}</p>
-                          <p className="text-gray-400">{m?.contactInfo?.mobile}</p>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex gap-2">
-                            <button onClick={() => setSelected(m)} className="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 border border-blue-200">
-                              <Eye size={18} />
-                            </button>
-                            <button onClick={() => handleDelete(m._id)} className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 border border-red-200">
-                              <Trash2 size={18} />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
 
-        {/* RIGHT SIDE: QUICK PREVIEW */}
+        {/* SIDE PREVIEW */}
         <div className="lg:col-span-1">
           {selected ? (
             <div className="bg-white rounded-2xl shadow-lg border border-gray-100 sticky top-6 overflow-hidden">
@@ -166,132 +151,161 @@ export default function AdminMentorsDashboard() {
                 <button onClick={() => setSelected(null)} className="p-1 hover:bg-white/20 rounded-full transition-colors"><X size={20}/></button>
               </div>
               <div className="p-6 space-y-6">
-                <div className="flex items-center gap-4 border-b pb-6">
-                  <div className="h-14 w-14 bg-gray-100 rounded-2xl flex items-center justify-center text-blue-600 text-xl font-black">
+                <div className="flex items-center gap-4">
+                  <div className="h-14 w-14 bg-gray-100 rounded-2xl flex items-center justify-center text-blue-600 text-xl font-black shadow-inner">
                     {selected?.personalInfo?.name?.charAt(0)}
                   </div>
                   <div>
-                    <h4 className="text-xl font-black text-gray-900 leading-tight">{selected?.personalInfo?.name}</h4>
-                    <p className="text-sm font-bold text-blue-600 uppercase tracking-tighter">{selected?.professionalInfo?.profession}</p>
+                    <h4 className="text-lg font-black text-gray-900 leading-tight">{selected?.personalInfo?.name}</h4>
+                    <p className="text-xs font-bold text-blue-600 uppercase tracking-widest">{selected?.professionalInfo?.profession}</p>
                   </div>
                 </div>
                 
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3 text-sm">
-                    <Building size={16} className="text-gray-400" />
-                    <span className="text-gray-700 font-semibold">{selected?.basicInfo?.institution}</span>
-                  </div>
-                  <div className="flex items-center gap-3 text-sm">
-                    <GraduationCap size={16} className="text-gray-400" />
-                    <span className="text-gray-700 font-semibold">{selected?.educationInfo?.phdBoard} (Ph.D)</span>
-                  </div>
+                <div className="space-y-3">
+                   <SidebarItem icon={<Building size={16}/>} label="Institution" value={selected?.basicInfo?.institution} />
+                   <SidebarItem icon={<GraduationCap size={16}/>} label="Highest Qual." value={selected?.educationInfo?.phdBoard} />
                 </div>
 
-                <div className={`p-4 rounded-xl border flex items-center gap-3 ${selected?.consent ? 'bg-green-50 border-green-200 text-green-700' : 'bg-red-50 border-red-200 text-red-700'}`}>
-                   <CheckCircle size={20} className={selected?.consent ? "text-green-600" : "text-red-500"}/>
-                   <span className="font-bold text-sm italic">Consent: {selected?.consent ? "Certified" : "Declined"}</span>
-                </div>
-
-                <button onClick={() => setSelected(selected)} className="w-full py-4 bg-gray-900 text-white rounded-xl font-black hover:bg-black transform transition-active active:scale-95 shadow-lg">
-                  VIEW FULL PROFILE
+                <button 
+                  onClick={() => openFullProfile(selected)} 
+                  className="w-full py-4 bg-gray-900 text-white rounded-xl font-black hover:bg-black transition-all shadow-lg active:scale-95"
+                >
+                  OPEN FULL PROFILE
                 </button>
               </div>
             </div>
           ) : (
             <div className="bg-white p-12 text-center rounded-2xl border-2 border-dashed border-gray-200">
-              <div className="h-20 w-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                <User size={40} className="text-gray-300" />
-              </div>
-              <p className="text-gray-500 font-bold">Select a mentor to review complete application</p>
+              <User size={40} className="text-gray-300 mx-auto mb-4" />
+              <p className="text-gray-500 font-bold">Select a mentor to review data</p>
             </div>
           )}
         </div>
       </div>
 
-      {/* FULL PROFILE MODAL (FETCHES ALL DATA INCLUDING EDUCATIONAL) */}
-      {selected && (
-        <div className="fixed inset-0 bg-black/70 z-50 flex items-start justify-center p-4 overflow-y-auto backdrop-blur-md">
-          <div className="bg-white max-w-5xl w-full rounded-3xl shadow-2xl my-6 overflow-hidden flex flex-col">
+      {/* FULL PROFILE MODAL */}
+      {showModal && selected && (
+        <div className="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm flex items-start justify-center p-4 overflow-y-auto">
+          <div className="bg-white max-w-5xl w-full rounded-3xl shadow-2xl my-6 overflow-hidden flex flex-col relative">
             
             {/* MODAL HEADER */}
-            <div className="p-8 border-b bg-white flex justify-between items-center sticky top-0 z-30">
+            <div className="p-8 border-b bg-white flex justify-between items-center sticky top-0 z-50">
               <div className="flex items-center gap-5">
-                <div className="h-14 w-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 border border-blue-100">
+                <div className="h-14 w-14 bg-blue-600 text-white rounded-2xl flex items-center justify-center shadow-lg">
                    <FileText size={28}/>
                 </div>
                 <div>
-                  <h2 className="text-3xl font-black text-gray-900">MN-{selected._id?.slice(-8).toUpperCase()}</h2>
-                  <p className="text-gray-500 font-bold flex items-center gap-2">
-                    <Calendar size={14}/> Submitted: {formatDate(selected.createdAt)}
+                  <h2 className="text-2xl font-black text-gray-900">{selected?.personalInfo?.name}</h2>
+                  <p className="text-gray-500 font-bold text-xs uppercase flex items-center gap-2">
+                    <Calendar size={14}/> ID: MN-{selected._id?.slice(-8).toUpperCase()} • Submitted: {formatDate(selected.createdAt)}
                   </p>
                 </div>
               </div>
-              <button onClick={() => setSelected(null)} className="p-3 hover:bg-gray-100 rounded-full transition-all text-gray-400 hover:text-red-500"><X size={32}/></button>
+              <button onClick={() => setShowModal(false)} className="p-3 hover:bg-gray-100 rounded-full text-gray-400 hover:text-red-500 transition-all"><X size={32}/></button>
             </div>
 
             {/* MODAL BODY */}
-            <div className="p-8 space-y-10 bg-gray-50/50">
+            <div className="p-8 space-y-12 bg-gray-50/50">
               
-              {/* TOP GRID: PERSONAL & CONTACT */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+              {/* BASIC INFORMATION TILES */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <section>
-                  <h3 className="text-xl font-black text-gray-900 mb-5 border-l-4 border-blue-600 pl-4">Mentor Identity</h3>
-                  <div className="bg-white p-6 rounded-2xl border shadow-sm space-y-4">
-                    <ProfileField label="Full Name" value={selected?.personalInfo?.name} />
-                    <ProfileField label="Father's Name" value={selected?.personalInfo?.father} />
-                    <ProfileField label="Mother's Name" value={selected?.personalInfo?.mother} />
-                    <ProfileField label="Date of Birth" value={formatDate(selected?.personalInfo?.dob)} />
-                    <ProfileField label="Address" value={`${selected?.contactInfo?.presentAddress}, ${selected?.contactInfo?.presentZip}`} />
-                    <ProfileField label="Mobile" value={selected?.contactInfo?.mobile} />
-                    <ProfileField label="Email" value={selected?.contactInfo?.email} />
+                  <h3 className="text-lg font-black text-gray-900 mb-4 border-l-4 border-blue-600 pl-4">Personal & Contact</h3>
+                  <div className="bg-white p-6 rounded-2xl border shadow-sm space-y-3">
+                    <DataRow label="Father's Name" value={selected?.personalInfo?.father} />
+                    <DataRow label="Mother's Name" value={selected?.personalInfo?.mother} />
+                    <DataRow label="DOB" value={formatDate(selected?.personalInfo?.dob)} />
+                    <DataRow label="Nationality" value={selected?.personalInfo?.nationality} />
+                    <DataRow label="Mobile" value={selected?.contactInfo?.mobile} />
+                    <DataRow label="Email" value={selected?.contactInfo?.email} />
+                    <DataRow label="Perm. Address" value={`${selected?.contactInfo?.permanentAddress}, ${selected?.contactInfo?.permanentZip}`} />
                   </div>
                 </section>
 
                 <section>
-                  <h3 className="text-xl font-black text-gray-900 mb-5 border-l-4 border-blue-600 pl-4">Professional & Research</h3>
-                  <div className="bg-white p-6 rounded-2xl border shadow-sm space-y-4">
-                    <ProfileField label="Institution" value={selected?.basicInfo?.institution} />
-                    <ProfileField label="Department" value={selected?.basicInfo?.department} />
-                    <ProfileField label="Profession" value={selected?.professionalInfo?.profession} />
-                    <ProfileField label="Experience" value={`${selected?.professionalInfo?.experience} Years`} />
-                    <ProfileField label="Research Area" value={selected?.basicInfo?.areaOfResearch} />
-                    <ProfileField label="Total Papers" value={selected?.researchInfo?.papers} />
+                  <h3 className="text-lg font-black text-gray-900 mb-4 border-l-4 border-blue-600 pl-4">Professional & Research</h3>
+                  <div className="bg-white p-6 rounded-2xl border shadow-sm space-y-3">
+                    <DataRow label="Profession" value={selected?.professionalInfo?.profession} />
+                    <DataRow label="Work Experience" value={`${selected?.professionalInfo?.experience} Years`} />
+                    <DataRow label="Institution" value={selected?.basicInfo?.institution} />
+                    <DataRow label="Department" value={selected?.basicInfo?.department} />
+                    <DataRow label="Research Area" value={selected?.basicInfo?.areaOfResearch} />
+                    <DataRow label="Thesis Title" value={selected?.researchInfo?.thesis} />
                   </div>
                 </section>
               </div>
 
-              {/* EDUCATIONAL DETAILS SECTION (NEWLY ADDED) */}
+              {/* EDUCATIONAL TABLE */}
               <section>
-                <h3 className="text-xl font-black text-gray-900 mb-5 border-l-4 border-blue-600 pl-4">Educational Qualification</h3>
-                <div className="bg-white rounded-2xl border shadow-sm overflow-hidden">
+                <h3 className="text-lg font-black text-gray-900 mb-4 border-l-4 border-blue-600 pl-4">Academic Background</h3>
+                <div className="bg-white rounded-2xl border shadow-sm overflow-hidden overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead className="bg-gray-50 border-b">
-                      <tr className="text-left font-bold text-gray-600">
+                      <tr className="text-left font-bold text-gray-500 uppercase text-xs tracking-wider">
                         <th className="px-6 py-4">Standard</th>
-                        <th className="px-6 py-4">Board / University / Institute</th>
-                        <th className="px-6 py-4">Status / Grade</th>
-                        <th className="px-6 py-4">Year</th>
+                        <th className="px-6 py-4">Board / University</th>
+                        <th className="px-6 py-4 text-center">Grade</th>
+                        <th className="px-6 py-4 text-center">Year</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y">
-                      <EduRow label="10th / Senior Secondary" board={selected?.educationInfo?.class10Board} grade={selected?.educationInfo?.class10Grade} year={selected?.educationInfo?.class10Year} />
-                      <EduRow label="12th / Higher Secondary" board={selected?.educationInfo?.class12Board} grade={selected?.educationInfo?.class12Grade} year={selected?.educationInfo?.class12Year} />
-                      <EduRow label="Graduation" board={selected?.educationInfo?.gradBoard} grade={selected?.educationInfo?.gradGrade} year={selected?.educationInfo?.gradYear} />
-                      <EduRow label="Post Graduation" board={selected?.educationInfo?.pgBoard} grade={selected?.educationInfo?.pgGrade} year={selected?.educationInfo?.pgYear} />
-                      <EduRow label="Ph.D / Research" board={selected?.educationInfo?.phdBoard} grade={selected?.educationInfo?.phdGrade} year={selected?.educationInfo?.phdYear} highlight />
+                    <tbody className="divide-y divide-gray-100">
+                      <AcademicRow label="10th Std" board={selected?.educationInfo?.class10Board} grade={selected?.educationInfo?.class10Grade} year={selected?.educationInfo?.class10Year} />
+                      <AcademicRow label="12th Std" board={selected?.educationInfo?.class12Board} grade={selected?.educationInfo?.class12Grade} year={selected?.educationInfo?.class12Year} />
+                      <AcademicRow label="Graduation" board={selected?.educationInfo?.gradBoard} grade={selected?.educationInfo?.gradGrade} year={selected?.educationInfo?.gradYear} />
+                      <AcademicRow label="Post Graduation" board={selected?.educationInfo?.pgBoard} grade={selected?.educationInfo?.pgGrade} year={selected?.educationInfo?.pgYear} />
+                      <AcademicRow label="Ph.D / Research" board={selected?.educationInfo?.phdBoard} grade={selected?.educationInfo?.phdGrade} year={selected?.educationInfo?.phdYear} highlight />
                     </tbody>
                   </table>
                 </div>
               </section>
 
-              {/* DETAILED RESPONSES (ACCORDIONS) */}
-              <section className="space-y-4">
-                <h3 className="text-xl font-black text-gray-900 mb-5 border-l-4 border-blue-600 pl-4">Assessment Responses</h3>
-                <Accordion title="Experience with PhD Aspirants" data={selected.studentInteraction} id="qa1" expanded={expanded} onToggle={toggle} />
-                <Accordion title="Guidance Challenges" data={selected.challengesSection} id="qa2" expanded={expanded} onToggle={toggle} />
-                <Accordion title="Incident-Based Reflection" data={selected.incidentsSection} id="qa3" expanded={expanded} onToggle={toggle} />
-                <Accordion title="Collaboration Intent" data={selected.intentSection} id="qa4" expanded={expanded} onToggle={toggle} />
-                <Accordion title="Ecosystem Reflection" data={selected.reflectionSection} id="qa5" expanded={expanded} onToggle={toggle} />
+              {/* DOCUMENTS & SIGNATURE */}
+              <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                  <h3 className="text-lg font-black text-gray-900 mb-4 border-l-4 border-blue-600 pl-4">Research Files (PDF)</h3>
+                  <div className="bg-white p-6 rounded-2xl border shadow-sm space-y-3">
+                    {selected?.researchFiles?.length > 0 ? selected.researchFiles.map((file, idx) => (
+                      <a 
+                        key={idx} 
+                        href={getFileUrl(file)} 
+                        target="_blank" 
+                        rel="noreferrer"
+                        className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-blue-50 border transition-colors group"
+                      >
+                        <File className="text-red-500 group-hover:scale-110 transition-transform" />
+                        <span className="text-sm font-bold text-gray-700 truncate">Document_0{idx + 1}.pdf</span>
+                        <Download size={16} className="ml-auto text-gray-400" />
+                      </a>
+                    )) : <p className="text-center text-gray-400 italic py-4">No documents available</p>}
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-black text-gray-900 mb-4 border-l-4 border-blue-600 pl-4">Signature / Photo</h3>
+                  <div className="bg-white p-4 rounded-2xl border shadow-sm flex flex-col items-center justify-center min-h-[160px]">
+                    {selected?.signatureFile ? (
+                      <img src={getFileUrl(selected.signatureFile)} alt="Signature" className="max-h-32 object-contain rounded-lg border p-1" />
+                    ) : (
+                      <div className="text-gray-300 flex flex-col items-center gap-2">
+                        <ImageIcon size={40}/>
+                        <span className="text-xs font-bold uppercase tracking-widest">No Signature File</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </section>
+
+              {/* DYNAMIC Q&A ACCORDIONS */}
+              <section className="space-y-4 pb-20">
+                <h3 className="text-lg font-black text-gray-900 mb-4 border-l-4 border-blue-600 pl-4">Detailed Assessment</h3>
+                <QAccordion title="Mentor Identity & Experience" data={selected.mentorIdentity} id="acc1" expanded={expanded} onToggle={toggleAccordion} />
+                <QAccordion title="Student Interaction Guidance" data={selected.studentInteraction} id="acc2" expanded={expanded} onToggle={toggleAccordion} />
+                <QAccordion title="Guidance Challenges" data={selected.challengesSection} id="acc3" expanded={expanded} onToggle={toggleAccordion} />
+                <QAccordion title="Incident-Based Reflection" data={selected.incidentsSection} id="acc4" expanded={expanded} onToggle={toggleAccordion} />
+                <QAccordion title="Mentor Role Perception" data={selected.mentorRoleSection} id="acc5" expanded={expanded} onToggle={toggleAccordion} />
+                <QAccordion title="Collaboration Alignment" data={selected.collaborationSection} id="acc6" expanded={expanded} onToggle={toggleAccordion} />
+                <QAccordion title="Collaboration Intent" data={selected.intentSection} id="acc7" expanded={expanded} onToggle={toggleAccordion} />
+                <QAccordion title="Ecosystem Reflection" data={selected.reflectionSection} id="acc8" expanded={expanded} onToggle={toggleAccordion} />
               </section>
 
             </div>
@@ -302,46 +316,70 @@ export default function AdminMentorsDashboard() {
   );
 }
 
-/* --- HELPER COMPONENTS --- */
+/* --- UI COMPONENTS --- */
 
-function ProfileField({ label, value }) {
+function SidebarItem({ icon, label, value }) {
   return (
-    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-gray-50 pb-3 last:border-0 last:pb-0">
-      <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{label}</span>
-      <span className="text-sm font-bold text-gray-800 text-right">{value || "—"}</span>
+    <div className="flex items-start gap-3">
+      <div className="text-gray-400 mt-0.5">{icon}</div>
+      <div>
+        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">{label}</p>
+        <p className="text-sm font-bold text-gray-800">{value || "Not specified"}</p>
+      </div>
     </div>
   );
 }
 
-function EduRow({ label, board, grade, year, highlight }) {
-  if (!board) return null;
+function DataRow({ label, value }) {
   return (
-    <tr className={`${highlight ? 'bg-blue-50/50' : ''}`}>
-      <td className="px-6 py-4 font-bold text-gray-700">{label}</td>
-      <td className="px-6 py-4 text-gray-600 font-medium">{board}</td>
-      <td className="px-6 py-4 text-gray-600 font-medium">{grade}</td>
-      <td className="px-6 py-4 text-gray-600 font-bold">{year}</td>
+    <div className="flex flex-col sm:flex-row sm:justify-between border-b border-gray-50 pb-2 last:border-0">
+      <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{label}</span>
+      <span className="text-sm font-bold text-gray-800 sm:text-right">{value || "—"}</span>
+    </div>
+  );
+}
+
+function AcademicRow({ label, board, grade, year, highlight }) {
+  if (!board && !grade && !year) return null;
+  return (
+    <tr className={highlight ? 'bg-blue-50/70 font-bold' : ''}>
+      <td className="px-6 py-4 text-gray-700 font-black">{label}</td>
+      <td className="px-6 py-4 text-gray-600 font-bold">{board || "—"}</td>
+      <td className="px-6 py-4 text-center text-gray-600 font-black">{grade || "—"}</td>
+      <td className="px-6 py-4 text-center text-gray-600 font-black">{year || "—"}</td>
     </tr>
   );
 }
 
-function Accordion({ title, data, id, expanded, onToggle }) {
-  if (!data?.length) return null;
+function QAccordion({ title, data, id, expanded, onToggle }) {
+  if (!data || data.length === 0) return null;
   const isOpen = expanded[id];
 
   return (
-    <div className="border border-gray-100 rounded-2xl bg-white shadow-sm overflow-hidden transition-all">
-      <button onClick={() => onToggle(id)} className="w-full flex justify-between items-center p-6 hover:bg-gray-50 font-bold text-gray-800">
-        <span>{title}</span>
-        {isOpen ? <ChevronUp className="text-blue-600"/> : <ChevronDown className="text-gray-400"/>}
+    <div className="bg-white border border-gray-100 rounded-3xl overflow-hidden shadow-sm transition-all duration-300">
+      <button 
+        onClick={() => onToggle(id)}
+        className={`w-full flex justify-between items-center p-6 text-left transition-colors ${isOpen ? 'bg-blue-600 text-white' : 'hover:bg-gray-50 text-gray-800'}`}
+      >
+        <span className="font-black text-sm uppercase tracking-wider">{title}</span>
+        {isOpen ? <ChevronUp size={20}/> : <ChevronDown size={20}/>}
       </button>
       {isOpen && (
-        <div className="p-8 bg-gray-50 border-t border-gray-100 space-y-6">
+        <div className="p-8 space-y-8 animate-in slide-in-from-top-2 duration-300">
           {data.map((item, idx) => (
-            <div key={idx} className="space-y-2">
-              <p className="text-sm font-black text-gray-900 leading-snug">{item.question}</p>
-              <div className="p-4 bg-white rounded-xl border border-gray-100 text-sm text-gray-600 font-medium shadow-sm">
-                 {Array.isArray(item.answer) ? item.answer.join(" • ") : item.answer || "N/A"}
+            <div key={idx} className="space-y-3">
+              <div className="flex items-start gap-3">
+                <div className="h-6 w-1 bg-blue-600 rounded-full mt-1 shrink-0"></div>
+                <p className="text-sm font-black text-gray-900 leading-snug">{item.question}</p>
+              </div>
+              <div className="ml-4 p-5 bg-gray-50 rounded-2xl border border-gray-100 text-sm text-gray-700 font-bold shadow-inner">
+                {Array.isArray(item.answer) ? (
+                  <div className="flex flex-wrap gap-2">
+                    {item.answer.map((ans, i) => (
+                      <span key={i} className="px-3 py-1 bg-blue-100 text-blue-700 rounded-lg text-xs font-black uppercase">{ans}</span>
+                    ))}
+                  </div>
+                ) : item.answer || "N/A"}
               </div>
             </div>
           ))}
