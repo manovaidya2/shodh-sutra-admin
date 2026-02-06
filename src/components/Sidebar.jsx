@@ -60,7 +60,7 @@ const Sidebar = () => {
                 to="/shodh-student-data"
                 className="flex items-center gap-2 px-2 py-2 rounded hover:bg-blue-900 hover:text-white transition-colors duration-200"
               >
-                <FaBook /> Shodh Student Data
+                <FaBook /> Admin Student 
               </Link>
             </li>
              <li className="mb-2">
@@ -76,7 +76,7 @@ const Sidebar = () => {
                 to="/shodh-admission-partners"
                 className="flex items-center gap-2 px-2 py-2 rounded hover:bg-blue-900 hover:text-white transition-colors duration-200"
               >
-                <FaBook /> Shodh Admission Partners
+                <FaBook /> Admin Institution
               </Link>
             </li>
             <li className="mb-2">
@@ -84,7 +84,7 @@ const Sidebar = () => {
                 to="/admin-university"
                 className="flex items-center gap-2 px-2 py-2 rounded hover:bg-blue-900 hover:text-white transition-colors duration-200"
               >
-                <FaBook /> Shodh University Partners
+                <FaBook /> Admin University
               </Link>
             </li>
           </ul>
