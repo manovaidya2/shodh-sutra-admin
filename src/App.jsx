@@ -9,9 +9,6 @@ import AdminGallery from "./pages/AdminGallery";
 import ShodhSutraAdmin from "./components/ShodhSutraAdmin";
 import AdminAdmissionPartners from "./pages/AdminAdmissionPartners";
 import AdminMentors from "./pages/AdminMentors";
-import ScholarshipAdmin from "./components/Scholarship";
-import PhdAdmissionAdmin from "./components/PhdForm";
-import AdminEntranceExamDashboard from "./components/CommonEntraceExam";
 
 
 
@@ -30,9 +27,6 @@ function App() {
           <Route path="/shodh-student-data" element={<Layout><ShodhSutraAdmin/></Layout>} />
           <Route path="/shodh-admission-partners" element={<Layout><AdminAdmissionPartners/></Layout>} />
            <Route path="/admin-mentors" element={<Layout><AdminMentors /></Layout>} />
-           <Route path="/scholarship" element={<Layout><ScholarshipAdmin /></Layout>} />
-           <Route path="/phd-admission" element={<Layout><PhdAdmissionAdmin /></Layout>} />
-           <Route path="/common-entrance-exam" element={<Layout><AdminEntranceExamDashboard /></Layout>} />
 
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
