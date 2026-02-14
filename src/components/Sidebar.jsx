@@ -79,6 +79,30 @@ const Sidebar = () => {
                 <FaBook /> Shodh Admission Partners
               </Link>
             </li>
+            <li className="mb-2">
+              <Link
+                to="/scholarship"
+                className="flex items-center gap-2 px-2 py-2 rounded hover:bg-blue-900 hover:text-white transition-colors duration-200"
+              >
+                <FaBook /> Scholarship Form
+              </Link>
+            </li>
+            <li className="mb-2">
+              <Link
+                to="/phd-admission"
+                className="flex items-center gap-2 px-2 py-2 rounded hover:bg-blue-900 hover:text-white transition-colors duration-200"
+              >
+                <FaBook /> PhdAdmission
+              </Link>
+            </li>
+            <li className="mb-2">
+              <Link
+                to="/common-entrance-exam"
+                className="flex items-center gap-2 px-2 py-2 rounded hover:bg-blue-900 hover:text-white transition-colors duration-200"
+              >
+                <FaBook /> Common Entrance Exam
+              </Link>
+            </li>
           </ul>
         </div>
 
