@@ -12,6 +12,7 @@ import AdminMentors from "./pages/AdminMentors";
 import ScholarshipAdmin from "./components/Scholarship";
 import AdminPhdDashboard from "./components/PhdForm";
 import AdminEntranceExamDashboard from "./components/CommonEntraceExam";
+import UniversityAdmin from "./pages/UniversityAdmin";
 
 
 
@@ -33,6 +34,7 @@ function App() {
            <Route path="/scholarship" element={<Layout><ScholarshipAdmin /></Layout>} />
            <Route path="/phd-admission" element={<Layout><AdminPhdDashboard /></Layout>} />
           <Route path="/common-entrance-exam" element={<Layout><AdminEntranceExamDashboard /></Layout>} />
+          <Route path="/admin-university" element={<Layout><UniversityAdmin /></Layout>} />
 
 
           <Route path="*" element={<Navigate to="/" />} />
